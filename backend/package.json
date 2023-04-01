@@ -1,0 +1,20 @@
+{
+  "name": "apv-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Pueba JS FullStack",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Nicolas Felipe Vanderstichel",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
