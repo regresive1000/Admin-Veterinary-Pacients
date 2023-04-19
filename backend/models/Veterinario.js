@@ -39,10 +39,11 @@ const veterinarioSchema = mongoose.Schema({
 
 // antes de guardar los datos en el DB, Hashea el password
 veterinarioSchema.pre('save', async function(next) {
-    if(!this.isModified('password')) {
+    if(!this.isModified('password')) { // Si el password no fue modificado (Porque pueden haber otros saves donde no se toque el password)
+                                        // Entonces pasa al siguiente middleware de una
         next();
-    }
-    const salt = await bcrypt.genSalt(10);
+    }                   
+    const salt = await bcrypt.genSalt(10); // Si el password es modificado, lo hashea nuevamente
     this.password = await bcrypt.hash(this.password, salt);
 
 });

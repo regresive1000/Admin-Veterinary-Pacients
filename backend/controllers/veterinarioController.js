@@ -1,5 +1,6 @@
 import Veterinario from "../models/Veterinario.js";
 import generarJWT from "../helpers/generarJWT.js";
+import generarId from "../helpers/generarId.js";
 
 const registrar = async (req, res) => {
     const {nombre, email, password} = req.body;
@@ -85,9 +86,69 @@ const autenticar = async (req, res) => {
     
 };
 
+const olvidePassword = async (req, res) => {
+    const { email } = req.body // req.body es info del body
+    
+    const existeVeterinario = await Veterinario.findOne( {email} );
+
+    if(!existeVeterinario) {
+        const error = new Error('No existe el usuario')     // SIEMPRE MANEJAR LOS ERRORES DE LOS CONTROLLER, SINO SE QUEDA LA PETICIÓN PENDIENTE
+        return res.status(400).json({ msg: error.message })
+    }
+    
+    try {
+        existeVeterinario.token = generarId(); // Genera el token por el que se va a enviar por mail 
+                                                // para verificar que el usuario quiere restablecer su contraseña
+        await existeVeterinario.save();
+        res.json({ msg: 'Hemos enviado un email con las instrucciónes'})
+    } catch (err) {
+        console.log(err)
+    }
+    
+};
+
+const comprobarToken = async (req, res) => {
+    const { token } = req.params; // req.params es info de la URL
+    const existeTokenVeterinario = await Veterinario.findOne({ token }); // Verifica si es un token valido que exista en el DB
+
+    if(!existeTokenVeterinario) {
+        const error = new Error('El link para reestablecer la contraseña es incorrecto o expiro');
+        return res.status(400).json({msg: error.message});
+    } else {
+        res.json({ msg: 'Token Valido y el usuario existe' })
+    }
+
+};
+
+const nuevoPassword = async (req, res) => {
+
+    const { token } = req.params;
+    const { password } = req.body;
+    
+    const veterinario = await Veterinario.findOne({ token });
+
+    if(!veterinario) { // Verifica que el token este en orden
+        const error = new Error('Hubo un error');
+        return res.status(400).json({msg: error.message});
+    }
+
+    try { // Cambia el password (es hasheado en el Model) y reinicia el token a null (convirtiendolo en solo de un uso)
+        veterinario.token = null;
+        veterinario.password = password;
+        await veterinario.save();
+
+        res.json({msg: 'Password modificado correctamente'});
+    } catch (error) {
+        console.log(error)
+    }
+};
+
 export {
     registrar,
     perfil,
     confirmar,
-    autenticar
+    autenticar,
+    olvidePassword,
+    comprobarToken,
+    nuevoPassword
 }
