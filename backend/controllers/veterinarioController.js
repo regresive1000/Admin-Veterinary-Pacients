@@ -2,6 +2,7 @@ import Veterinario from "../models/Veterinario.js";
 import generarJWT from "../helpers/generarJWT.js";
 import generarId from "../helpers/generarId.js";
 import emailRegistro from "../helpers/emailRegistro.js";
+import emailOlvidePassword from "../helpers/emailOlvidePassword.js";
 
 const registrar = async (req, res) => {
     const {nombre, email} = req.body;
@@ -46,7 +47,6 @@ const confirmar = async (req, res) => {
     const token = req.params.token;
     
     const usuarioConfirmar = await Veterinario.findOne({ token }); //lo pongo una vez, porque al ser autodeclarativa da por entendido que llave y valor son lo mismo
-    
     if(!usuarioConfirmar) {
         const error = new Error('Token no valido');
         return res.status(404).json({ msg: error.message });
@@ -106,6 +106,11 @@ const olvidePassword = async (req, res) => {
         existeVeterinario.token = generarId(); // Genera el token por el que se va a enviar por mail 
                                                 // para verificar que el usuario quiere restablecer su contraseña
         await existeVeterinario.save();
+        emailOlvidePassword({
+            nombre: existeVeterinario.nombre,
+            token: existeVeterinario.token,
+            email
+        });
         res.json({ msg: 'Hemos enviado un email con las instrucciónes'})
     } catch (err) {
         console.log(err)

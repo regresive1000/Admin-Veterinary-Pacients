@@ -12,7 +12,7 @@ dotenv.config();
 
 conectarDB();
 
-const dominiosPermitidos = ["http://localhost:5173"]; // Los dominios que estan permitidos en la petición
+const dominiosPermitidos = [process.env.FRONTEND_URL]; // Los dominios que estan permitidos en la petición
 
 const corsOptions = {
     origin: function(origin, callback) {
