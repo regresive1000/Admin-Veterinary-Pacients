@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import axios from 'axios';
+import Alerta from '../components/Alerta';
 
 const Registrar = () => {
 
@@ -9,24 +10,44 @@ const Registrar = () => {
   const [ password, setPassword ] = useState('');
   const [ repetirPassword, setRepetirPassword ] = useState('');
 
-  const handleSubmit = (e) => {
+  const [alerta, setAlerta] = useState({});
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    
     if([nombre, email, password, repetirPassword].includes('')) {
-      console.log('Hay campos vacios')
+      setAlerta({ msg: 'Hay campos vacios', error: true })
       return;
     }
 
     if(password !== repetirPassword) {
-      console.log('Los passwords no son iguales');
+      setAlerta({ msg: 'Los passwords no son iguales', error: true });
       return;
     }
 
     if(password.length < 8) {
-      console.log('El password es muy corto');
+      setAlerta({ msg: 'El password es muy corto', error: true });
       return;
     }
+  
+    setAlerta({})
+
+    // Crear el usuario en la api
+
+    try {
+      const url = 'http://localhost:4000/api/veterinarios'
+      const respuesta = await axios.post(url, { nombre, email, password});
+      
+      setAlerta({
+        msg: 'Creado Correctamente, revisa tu email',
+        error: false
+      })
+    } catch (error) {
+      setAlerta({msg: error.response.data.msg, error: true}) // Muestra el error enviado de backend
+    }
+
   }
+
+  const { msg } = alerta;
 
   return (
     <>
@@ -36,6 +57,13 @@ const Registrar = () => {
         <span className="text-black"> Pacientes</span></h1>
 
       <div className='mt-20 md:mt-5 shadow-lg px-5 py-10 rounded-xl bg-white'>
+
+        { msg && 
+          <Alerta
+          alerta={alerta}
+          />  
+        }
+        
         <form
           
           onSubmit={handleSubmit}
@@ -116,6 +144,6 @@ const Registrar = () => {
       
     </>
   )
-  }
+}
   
   export default Registrar

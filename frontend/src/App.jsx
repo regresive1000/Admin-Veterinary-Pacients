@@ -16,7 +16,7 @@ function App() {
           <Route index element={<Login />} /> /* Index hace que AuthLayout (que es la pagina principal), la convierte en la raiz */
           <Route path="registrar" element={<Registrar />} /> /* Path son las extensiones de la raíz y las secciones a printear */
           <Route path="olvide-password" element={<OlvidePassword />} />
-          <Route path="confirmar/:id" element={<ConfirmarCuenta />} />
+          <Route path="confirmar/:token" element={<ConfirmarCuenta />} />
         </Route>
 
       </Routes>
