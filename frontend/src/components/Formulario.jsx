@@ -23,7 +23,7 @@ function Formulario() {
             setEmail(paciente.email);
             setFecha(paciente.fecha);
             setSintomas(paciente.sintomas);
-            setId(paciente._id);
+            setId(paciente.id);
         }
     }, [paciente])
 
@@ -37,8 +37,20 @@ function Formulario() {
             return
         }
 
-        setAlerta({});
+        
         guardarPaciente({ nombre, propietario, email, fecha, sintomas, id })
+        setAlerta({
+            msg: 'Guardado correctamente',
+            error: false
+        });
+
+        setNombre('');
+        setPropietario('');
+        setEmail('');
+        setFecha('');
+        setSintomas('');
+        setId('');
+
     }
 
     

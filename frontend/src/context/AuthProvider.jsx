@@ -22,7 +22,7 @@ const AuthProvider = (props) => {
             const config = { // como bajo el token del servidor, lo autentico cada vez que inicie en la página y si token es true, le paso por headers la authorization
                 headers: {
                     "Content-type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 }
             }
 
@@ -43,13 +43,72 @@ const AuthProvider = (props) => {
         setAuth({});
     }
 
+    const actualizarPerfil = async (datos) => {
+        console.log(datos._id)
+        const token = localStorage.getItem('token');
+
+        if(!token) {
+            setCargando(false)
+            return
+        }
+        const config = { 
+            headers: {
+                "Content-type": "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+        try {
+            const data = await clienteAxios.put(`veterinarios/perfil/${datos._id}`, datos, config)
+            return {
+                msg: "Almacenado correctamente",
+                error: false
+            }
+        } catch (error) {
+            return {
+                msg: error.response.data.msg,
+                error: true
+            }
+        }
+    }
+
+    const guardarPassword = async (datos) => {
+        const token = localStorage.getItem('token');
+
+        if(!token) {
+            setCargando(false)
+            return
+        }
+        const config = { 
+            headers: {
+                "Content-type": "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+        try {
+            const { data } = await clienteAxios.put('/veterinarios/actualizar-password', datos, config);
+            return {
+                msg: data.msg,
+                error: false
+            }
+        } catch (error) {
+            return {
+                msg: error.response.data.msg,
+                error: true
+            }
+        }
+    }
+
     return(
         <AuthContext.Provider // El value le paso un objeto que va a contener todos los valores que van a estar disponibles cuando mande a llamar el hook useAuth
             value={{
                 auth,
                 setAuth,
                 cargando,
-                cerrarSesion
+                cerrarSesion,
+                actualizarPerfil,
+                guardarPassword
             }}
         >
 

@@ -1,6 +1,6 @@
 import {createContext, useState, useEffect} from 'react';
 import clienteAxios from '../config/axios';
-
+import useAuth from '../hooks/useAuth';
 
 const PacienteContext = createContext();
 
@@ -8,6 +8,7 @@ const PacientesProvider = ({children}) => {
 
     const [ pacientes, setPacientes ] = useState([]);
     const [ paciente, setPaciente ] = useState({});
+    const { auth } = useAuth();
 
     useEffect( () => {
         const obtenerPacientes = async () => {
@@ -33,12 +34,10 @@ const PacientesProvider = ({children}) => {
         }
         obtenerPacientes()
 
-    }, [])
+    }, [auth]);
 
 
     const guardarPaciente = async (paciente) => {
-
-        console.log(paciente)
 
         const token = localStorage.getItem('token');
         const config = {
@@ -48,11 +47,19 @@ const PacientesProvider = ({children}) => {
             }
         }
 
-        if(paciente.id) { // Si esta editando va a esta parte del if
+        if(paciente._id) { // Si esta editando va a esta parte del if
             try {
                 const { data } = await clienteAxios.put(`/pacientes/${paciente.id}`, paciente, config);
-                console.log(`/pacientes/${paciente._id}`)
-                const pacientesActualizado = pacientes.map( pacienteState => pacienteState.id === data._id ? data : pacienteState) // Actualiza la lista de pacientes
+                const pacienteActDB = data.pacienteActualizado;
+                const pacientesActualizado = pacientes.map( pacienteState => {
+                    if(pacienteState._id === pacienteActDB._id) {
+                        return pacienteActDB
+                    }
+                    return pacienteState // Actualiza la lista de pacientes, armando una coopia
+                }); 
+                console.log(pacientesActualizado);
+                setPaciente({});
+                setPacientes(pacientesActualizado);
             } catch (error) {
                 console.log(error)
             }
@@ -73,13 +80,39 @@ const PacientesProvider = ({children}) => {
         setPaciente(paciente);
     }
 
+    const eliminarPaciente = async (id, nombre) => {
+        
+        const confirmar = confirm(`¿Confirmas que deseas eliminar al paciente ${nombre}?`)
+
+        if(!confirmar) return
+
+        const token = localStorage.getItem('token');
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+        try {
+            const data = await  clienteAxios.delete(`/pacientes/${id}`, config)
+            const pacientesActualizado = pacientes.filter( pacienteState => {
+                return pacienteState._id !== id 
+            });
+            setPacientes(pacientesActualizado);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <PacienteContext.Provider
             value={{
                 pacientes,
                 guardarPaciente,
                 setEdicion,
-                paciente
+                paciente,
+                eliminarPaciente
             }}
         >
             {children}
