@@ -22,9 +22,6 @@ const obtenerPaciente = async (req, res) => {
     const id = req.params.id // Recoge el siguiente parametro de la raiz ID, llave ID y valor lo que sea la url
     const paciente = await Paciente.findById(id);
 
-    console.log(paciente.veterinario._id) 
-    console.log(req.veterinario._id) 
-
     if(paciente.veterinario._id.toString() !== req.veterinario._id.toString()) { // Hay que convertir los objectID a string porque vana  ser evualados de forma diferente cada vez que pase por el if
         return res.json({ msg: 'Accion no valida'})
     }
@@ -38,9 +35,6 @@ const obtenerPaciente = async (req, res) => {
 const actualizarPaciente = async (req, res) => {
     const { id } = req.params // Recoge el siguiente parametro de la raiz ID, llave ID y valor lo que sea la url
     const paciente = await Paciente.findById(id);
-
-    console.log(paciente.veterinario._id) 
-    console.log(req.veterinario._id)
 
     if(!paciente) {
         return res.status(404).json({ msg: "No encontrado" }); // Si no hay paciente
@@ -68,9 +62,6 @@ const actualizarPaciente = async (req, res) => {
 const eliminarPaciente = async (req, res) => {
     const { id } = req.params // Recoge el siguiente parametro de la raiz ID, llave ID y valor lo que sea la url
     const paciente = await Paciente.findById(id);
-
-    console.log(paciente.veterinario._id) 
-    console.log(req.veterinario._id)
 
     if(!paciente) {
         return res.status(404).json({ msg: "No encontrado" }); // Si no hay paciente

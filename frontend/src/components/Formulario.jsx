@@ -15,7 +15,7 @@ function Formulario() {
 
     const { guardarPaciente, paciente } = usePacientes();
     
-
+    
     useEffect(() => {
         if(paciente?.nombre) {
             setNombre(paciente.nombre);
@@ -23,7 +23,7 @@ function Formulario() {
             setEmail(paciente.email);
             setFecha(paciente.fecha);
             setSintomas(paciente.sintomas);
-            setId(paciente.id);
+            setId(paciente._id);
         }
     }, [paciente])
 

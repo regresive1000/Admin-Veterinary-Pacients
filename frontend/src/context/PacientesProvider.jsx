@@ -47,7 +47,7 @@ const PacientesProvider = ({children}) => {
             }
         }
 
-        if(paciente._id) { // Si esta editando va a esta parte del if
+        if(paciente.id) { // Si esta editando va a esta parte del if
             try {
                 const { data } = await clienteAxios.put(`/pacientes/${paciente.id}`, paciente, config);
                 const pacienteActDB = data.pacienteActualizado;
